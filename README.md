@@ -1,4 +1,11 @@
 
+
+| client->server | www.qq.com | www.baidu.com | httpbin.egressdemo.svc.cluster.local |
+|---|---|---|---|
+|sleep1  | 401 | ok  | ok  |
+|sleep2  | ok  | 401 | ok  |
+
+
 pod sleep-1:
 
 
