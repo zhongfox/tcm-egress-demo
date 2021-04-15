@@ -1,0 +1,109 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: egressdemo
+  labels:
+    istio.io/rev: 1-8-1
+---
+
+apiVersion: networking.istio.io/v1beta1
+kind: Sidecar
+metadata:
+  name: normal-restrict
+  namespace: egressdemo
+spec:
+  egress:
+    - hosts:
+        - "*/*"
+  outboundTrafficPolicy:
+    mode: REGISTRY_ONLY
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpbin
+  namespace: egressdemo
+  labels:
+    app: httpbin
+    service: httpbin
+spec:
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 80
+  selector:
+    app: httpbin
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpbin
+  namespace: egressdemo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpbin
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: httpbin
+        version: v1
+    spec:
+      containers:
+      - image: docker.io/kennethreitz/httpbin
+        imagePullPolicy: IfNotPresent
+        name: httpbin
+        ports:
+        - containerPort: 80
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sleep-1
+  namespace: egressdemo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sleep-1
+  template:
+    metadata:
+      labels:
+        app: sleep-1
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+      - name: sleep
+        image: curlimages/curl
+        command: ["/bin/sleep", "3650d"]
+        imagePullPolicy: IfNotPresent
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sleep-2
+  namespace: egressdemo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sleep-2
+  template:
+    metadata:
+      labels:
+        app: sleep-2
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+      - name: sleep
+        image: curlimages/curl
+        command: ["/bin/sleep", "3650d"]
+        imagePullPolicy: IfNotPresent
+---

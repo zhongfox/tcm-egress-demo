@@ -1,0 +1,53 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: egressdemo-mesh-vs-qq
+  namespace: egressdemo
+spec:
+  hosts:
+  - "www.qq.com"
+  http:
+  - match:
+    - sourceLabels:
+        app: sleep-1
+    route:
+    - destination:
+        host: istio-egressgateway-1.istio-system.svc.cluster.local
+        port:
+          number: 8080
+  - route:
+    - destination:
+        host: istio-egressgateway-1.istio-system.svc.cluster.local
+    fault:
+      abort:
+        percentage:
+          value: 100
+        httpStatus: 401
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: egressdemo-mesh-vs-baidu
+  namespace: egressdemo
+spec:
+  hosts:
+  - "www.baidu.com"
+  http:
+  - match:
+    - sourceLabels:
+        app: sleep-2
+    route:
+    - destination:
+        host: istio-egressgateway-1.istio-system.svc.cluster.local
+        port:
+          number: 8080
+  - route:
+    - destination:
+        host: istio-egressgateway-1.istio-system.svc.cluster.local
+    fault:
+      abort:
+        percentage:
+          value: 100
+        httpStatus: 401
+---
